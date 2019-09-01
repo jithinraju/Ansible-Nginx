@@ -17,7 +17,7 @@ Here I created a simple NGINX configuration file in the master server as a templ
 server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        root /home/((domain));
+        root /home/{{domain}};
         server_name {{domain}} www.{{domain}};
         location / {
                 try_files $uri $uri/ =404;
