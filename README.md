@@ -7,19 +7,18 @@ Playbook installs and configures the Nginx from the Nginx apt repository and con
 
 ## Creating Configuration file
 
-Here I created a simple NGINX configuration file in the master server with basic codes to run a website. You can edit the configuration with the needed options. 
+Here I created a simple NGINX configuration file in the master server as a template with basic codes to run a website. You can edit the configuration with the needed options. 
 
 - root option defines the document root of the website
 
-NGINX configuration is copied to the clients from the master to clients
 
 ```bash
 
 server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        root /home/site; <<Document root>>
-        server_name _;
+        root /home/((domain));
+        server_name {{domain}} www.{{domain}};
         location / {
                 try_files $uri $uri/ =404;
         }
@@ -36,8 +35,9 @@ server {
 - name: 'install nginx'
   hosts: ubuntu
   become: yes
+  vars:
+    domain: example.com
   tasks:
-
     - name: 'nginx'
       apt:
        name: nginx
@@ -45,7 +45,7 @@ server {
 
     - name: 'copy conf'
       copy:
-        src: /nginx.conf
+        src: nginx.j2
         dest: /etc/nginx/sites-available/site.cfg
 
     - name: 'create symlink'
@@ -56,13 +56,13 @@ server {
 
     - name: 'create directory'
       file:
-         path: /home/site
+         path: /home/{{domain}}
          state: directory
 
     - name: 'add web contents'
       copy:
         content: "<h1>it works</h1>"
-        dest: /home/site/index.html
+        dest: /home/{{domain}}/index.html
 
     - name: 'restart'
       service:
