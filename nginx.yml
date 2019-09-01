@@ -1,0 +1,36 @@
+---
+- name: 'install nginx'
+  hosts: ubuntu
+  become: yes
+  tasks:
+    
+    - name: 'nginx'
+      apt: 
+       name: nginx
+       state: present
+    
+    - name: 'copy conf'
+      copy: 
+        src: /home/ec2-user/nginx.conf
+        dest: /etc/nginx/sites-available/site.cfg
+     
+    - name: 'create symlink'
+      file:
+        src: /etc/nginx/sites-available/site.cfg
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+    
+    - name: 'create directory'
+      file:
+         path: /home/site
+         state: directory
+
+    - name: 'add web contents'
+      copy:
+        content: "<h1>it works</h1>"
+        dest: /home/site/index.html
+
+    - name: 'restart'
+      service:
+          name: nginx
+          state: restarted
